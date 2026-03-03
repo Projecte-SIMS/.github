@@ -26,13 +26,13 @@ SIMS es una plataforma integral para la gestión y monitorización de movilidad 
 
 | Componente | README | Documentación Detallada |
 |------------|--------|-------------------------|
-| **Backend (Laravel)** | [README.md](https://github.com/Projecte-SIMS/Backend/blob/main/README.md) | [docs/](https://github.com/Projecte-SIMS/Backend/tree/main/docs) |
-| **Frontend (Vue)** | [README.md](https://github.com/Projecte-SIMS/Frontend/blob/main/README.md) | [docs/](https://github.com/Projecte-SIMS/Frontend/tree/main/docs) |
+| **Backend (Laravel)** | [README.md](https://github.com/Projecte-SIMS/Backend/blob/develop/README.md) | [docs/](https://github.com/Projecte-SIMS/Backend/tree/develop/docs) |
+| **Frontend (Vue)** | [README.md](https://github.com/Projecte-SIMS/Frontend/blob/develop/README.md) | [docs/](https://github.com/Projecte-SIMS/Frontend/tree/develop/docs) |
 | **IoT (Raspberry Pi)** | [README.md](https://github.com/Projecte-SIMS/IoT/blob/main/README.md) | [ESTADO_SUBSISTEMA_IOT.md](https://github.com/Projecte-SIMS/IoT/blob/main/ESTADO_SUBSISTEMA_IOT.md) |
 
 ### 📖 Manual de Usuario
 
-**[Manual de Usuario por Rol](https://github.com/Projecte-SIMS/Frontend/blob/main/docs/MANUAL_USUARIO.md)** - Guía completa de uso del sistema para:
+**[Manual de Usuario por Rol](https://github.com/Projecte-SIMS/Frontend/blob/develop/docs/MANUAL_USUARIO.md)** - Guía completa de uso del sistema para:
 - Usuarios (Clientes)
 - Administradores
 - Personal de Mantenimiento
@@ -157,7 +157,7 @@ docker-compose up --build
 | Cliente | 25+ | perfil, vehículos, reservas, tickets, chatbot |
 | Admin | 30+ | CRUD completo, comandos IoT, health checks |
 
-Ver detalles en: [API_ENDPOINTS.md](https://github.com/Projecte-SIMS/Backend/blob/main/docs/API_ENDPOINTS.md)
+Ver detalles en: [API_ENDPOINTS.md](https://github.com/Projecte-SIMS/Backend/blob/develop/docs/API_ENDPOINTS.md)
 
 ---
 
@@ -317,12 +317,12 @@ IoT/
 | Requisito | Estado | Ubicación |
 |-----------|--------|-----------|
 | Explicación de arquitectura | ✅ Completado | Este README + diagramas |
-| Explicación del modelo de BD | ✅ Completado | [DATABASE.md](https://github.com/Projecte-SIMS/Backend/blob/main/docs/DATABASE.md) |
-| Explicación de endpoints | ✅ Completado | [API_ENDPOINTS.md](https://github.com/Projecte-SIMS/Backend/blob/main/docs/API_ENDPOINTS.md) |
+| Explicación del modelo de BD | ✅ Completado | [DATABASE.md](https://github.com/Projecte-SIMS/Backend/blob/develop/docs/DATABASE.md) |
+| Explicación de endpoints | ✅ Completado | [API_ENDPOINTS.md](https://github.com/Projecte-SIMS/Backend/blob/develop/docs/API_ENDPOINTS.md) |
 | Justificación técnica | ✅ Completado | READMEs de cada repositorio |
 | Explicación del sistema de IA | ✅ Completado | ChatbotController documentado |
 | Explicación de testing/debugging | ✅ Completado | Sección 1.4 de este documento |
-| Manual básico de uso por rol | ✅ Completado | [MANUAL_USUARIO.md](https://github.com/Projecte-SIMS/Frontend/blob/main/docs/MANUAL_USUARIO.md) |
+| Manual básico de uso por rol | ✅ Completado | [MANUAL_USUARIO.md](https://github.com/Projecte-SIMS/Frontend/blob/develop/docs/MANUAL_USUARIO.md) |
 
 ---
 
