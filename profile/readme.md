@@ -11,7 +11,7 @@ SIMS es una plataforma integral para la gestión y monitorización de movilidad 
 
 ---
 
-## 🗂️ Repositorios del Proyecto
+## Repositorios del Proyecto
 
 | Componente | Repositorio | Tecnología |
 |------------|-------------|------------|
@@ -22,7 +22,7 @@ SIMS es una plataforma integral para la gestión y monitorización de movilidad 
 
 ---
 
-## 📚 Documentación por Componente
+## Documentación por Componente
 
 | Componente | README | Documentación Detallada |
 |------------|--------|-------------------------|
@@ -30,7 +30,7 @@ SIMS es una plataforma integral para la gestión y monitorización de movilidad 
 | **Frontend (Vue)** | [README.md](https://github.com/Projecte-SIMS/Frontend/blob/develop/README.md) | [docs/](https://github.com/Projecte-SIMS/Frontend/tree/develop/docs) |
 | **IoT (Raspberry Pi)** | [README.md](https://github.com/Projecte-SIMS/IoT/blob/main/README.md) | [ESTADO_SUBSISTEMA_IOT.md](https://github.com/Projecte-SIMS/IoT/blob/main/ESTADO_SUBSISTEMA_IOT.md) |
 
-### 📖 Manual de Usuario
+### Manual de Usuario
 
 **[Manual de Usuario por Rol](https://github.com/Projecte-SIMS/Frontend/blob/develop/docs/MANUAL_USUARIO.md)** - Guía completa de uso del sistema para:
 - Usuarios (Clientes)
@@ -214,7 +214,7 @@ IoT/
 
 ---
 
-## 📋 Análisis de Cumplimiento del Sprint
+## Análisis de Cumplimiento del Sprint
 
 ### ✅ 1. Backend (Entorn servidor)
 
@@ -316,17 +316,17 @@ IoT/
 
 | Requisito | Estado | Ubicación |
 |-----------|--------|-----------|
-| Explicación de arquitectura | ✅ Completado | Este README + diagramas |
+| Explicación de arquitectura | ✅ Completado | [Arquitectura General](#arquitectura-general) |
 | Explicación del modelo de BD | ✅ Completado | [DATABASE.md](https://github.com/Projecte-SIMS/Backend/blob/develop/docs/DATABASE.md) |
 | Explicación de endpoints | ✅ Completado | [API_ENDPOINTS.md](https://github.com/Projecte-SIMS/Backend/blob/develop/docs/API_ENDPOINTS.md) |
-| Justificación técnica | ✅ Completado | READMEs de cada repositorio |
-| Explicación del sistema de IA | ✅ Completado | ChatbotController documentado |
-| Explicación de testing/debugging | ✅ Completado | Sección 1.4 de este documento |
+| Justificación técnica | ✅ Completado | [Backend README](https://github.com/Projecte-SIMS/Backend/blob/develop/README.md) / [Frontend README](https://github.com/Projecte-SIMS/Frontend/blob/develop/README.md) / [IoT README](https://github.com/Projecte-SIMS/IoT/blob/main/README.md) |
+| Explicación del sistema de IA | ✅ Completado | [ChatbotController](https://github.com/Projecte-SIMS/Backend/blob/develop/app/Http/Controllers/Api/ChatbotController.php) |
+| Explicación de testing/debugging | ✅ Completado | [Sección 1.4 Debug y monitorización](#14-debug-y-monitorización) |
 | Manual básico de uso por rol | ✅ Completado | [MANUAL_USUARIO.md](https://github.com/Projecte-SIMS/Frontend/blob/develop/docs/MANUAL_USUARIO.md) |
 
 ---
 
-### 📊 Resumen de Cumplimiento
+### Resumen de Cumplimiento
 
 | Categoría | Completado | Total | Porcentaje |
 |-----------|------------|-------|------------|
