@@ -1,5 +1,5 @@
 # SIMS – Sistema Intel·ligent de Mobilitat Sostenible  
-**Versión:** Sprint 5 – First Deployment  
+**Versión:** Sprint 4 – First Deployment  
 **Fecha:** 2026-03-03  
 **Última revisión:** 2026-03-03
 
@@ -11,17 +11,28 @@ SIMS es una plataforma integral para la gestión y monitorización de movilidad 
 
 ---
 
-## Documentación por Componente
+## 🗂️ Repositorios del Proyecto
+
+| Componente | Repositorio | Tecnología |
+|------------|-------------|------------|
+| **Backend** | [Backend](https://github.com/Projecte-SIMS/Backend) | Laravel (PHP) |
+| **Frontend** | [Frontend](https://github.com/Projecte-SIMS/Frontend) | Vue + TypeScript |
+| **IoT** | [IoT](https://github.com/Projecte-SIMS/IoT) | FastAPI (Python) |
+| **Profile** | Este repositorio | Documentación general |
+
+---
+
+## 📚 Documentación por Componente
 
 | Componente | README | Documentación Detallada |
 |------------|--------|-------------------------|
-| **Backend (Laravel)** | [../project-sims-backend/README.md](../project-sims-backend/README.md) | [../project-sims-backend/docs/](../project-sims-backend/docs/) |
-| **Frontend (Vue)** | [../project-sims-frontend/README.md](../project-sims-frontend/README.md) | [../project-sims-frontend/docs/](../project-sims-frontend/docs/) |
-| **IoT (Raspberry Pi)** | [../Raspberry_py/README.md](../Raspberry_py/README.md) | [../Raspberry_py/ESTADO_SUBSISTEMA_IOT.md](../Raspberry_py/ESTADO_SUBSISTEMA_IOT.md) |
+| **Backend (Laravel)** | [README.md](https://github.com/Projecte-SIMS/Backend/blob/main/README.md) | [docs/](https://github.com/Projecte-SIMS/Backend/tree/main/docs) |
+| **Frontend (Vue)** | [README.md](https://github.com/Projecte-SIMS/Frontend/blob/main/README.md) | [docs/](https://github.com/Projecte-SIMS/Frontend/tree/main/docs) |
+| **IoT (Raspberry Pi)** | [README.md](https://github.com/Projecte-SIMS/IoT/blob/main/README.md) | [ESTADO_SUBSISTEMA_IOT.md](https://github.com/Projecte-SIMS/IoT/blob/main/ESTADO_SUBSISTEMA_IOT.md) |
 
 ### 📖 Manual de Usuario
 
-**[Manual de Usuario por Rol](../project-sims-frontend/docs/MANUAL_USUARIO.md)** - Guía completa de uso del sistema para:
+**[Manual de Usuario por Rol](https://github.com/Projecte-SIMS/Frontend/blob/main/docs/MANUAL_USUARIO.md)** - Guía completa de uso del sistema para:
 - Usuarios (Clientes)
 - Administradores
 - Personal de Mantenimiento
@@ -146,7 +157,7 @@ docker-compose up --build
 | Cliente | 25+ | perfil, vehículos, reservas, tickets, chatbot |
 | Admin | 30+ | CRUD completo, comandos IoT, health checks |
 
-Ver detalles en: [../project-sims-backend/docs/API_ENDPOINTS.md](../project-sims-backend/docs/API_ENDPOINTS.md)
+Ver detalles en: [API_ENDPOINTS.md](https://github.com/Projecte-SIMS/Backend/blob/main/docs/API_ENDPOINTS.md)
 
 ---
 
@@ -179,24 +190,26 @@ Ver detalles en: [../project-sims-backend/docs/API_ENDPOINTS.md](../project-sims
 ## Ubicación de Archivos Importantes
 
 ```
-SIMS_SPRINT4/
-├── profile/
-│   └── readme.md              # Este archivo
-├── project-sims-backend/
-│   ├── README.md              # Documentación backend
-│   ├── docs/                  # Docs detalladas
-│   │   └── API_ENDPOINTS.md   # Referencia de endpoints
-│   ├── public/logo.png        # Logo del proyecto
-│   └── .env                   # Configuración
-├── project-sims-frontend/
-│   ├── README.md              # Documentación frontend
-│   ├── docs/                  # Docs detalladas
-│   └── public/logo.png        # Logo del proyecto
-└── Raspberry_py/
-    ├── README.md              # Documentación IoT
-    ├── ESTADO_SUBSISTEMA_IOT.md # Estado detallado
-    ├── server/                # Servidor FastAPI
-    └── agent/                 # Agente Raspberry Pi
+# En cada repositorio:
+
+Backend/
+├── README.md              # Documentación backend
+├── docs/                  # Docs detalladas
+│   └── API_ENDPOINTS.md   # Referencia de endpoints
+├── public/logo.png        # Logo del proyecto
+└── .env                   # Configuración
+
+Frontend/
+├── README.md              # Documentación frontend
+├── docs/                  # Docs detalladas
+│   └── MANUAL_USUARIO.md  # Manual por rol
+└── public/logo.png        # Logo del proyecto
+
+IoT/
+├── README.md              # Documentación IoT
+├── ESTADO_SUBSISTEMA_IOT.md # Estado detallado
+├── server/                # Servidor FastAPI
+└── agent/                 # Agente Raspberry Pi
 ```
 
 ---
@@ -304,12 +317,12 @@ SIMS_SPRINT4/
 | Requisito | Estado | Ubicación |
 |-----------|--------|-----------|
 | Explicación de arquitectura | ✅ Completado | Este README + diagramas |
-| Explicación del modelo de BD | ✅ Completado | `docs/DATABASE.md` |
-| Explicación de endpoints | ✅ Completado | `docs/API_ENDPOINTS.md` |
-| Justificación técnica | ✅ Completado | READMEs de cada componente |
+| Explicación del modelo de BD | ✅ Completado | [DATABASE.md](https://github.com/Projecte-SIMS/Backend/blob/main/docs/DATABASE.md) |
+| Explicación de endpoints | ✅ Completado | [API_ENDPOINTS.md](https://github.com/Projecte-SIMS/Backend/blob/main/docs/API_ENDPOINTS.md) |
+| Justificación técnica | ✅ Completado | READMEs de cada repositorio |
 | Explicación del sistema de IA | ✅ Completado | ChatbotController documentado |
 | Explicación de testing/debugging | ✅ Completado | Sección 1.4 de este documento |
-| Manual básico de uso por rol | ✅ Completado | `docs/MANUAL_USUARIO.md` |
+| Manual básico de uso por rol | ✅ Completado | [MANUAL_USUARIO.md](https://github.com/Projecte-SIMS/Frontend/blob/main/docs/MANUAL_USUARIO.md) |
 
 ---
 
