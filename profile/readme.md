@@ -5,6 +5,36 @@
 
 ---
 
+## 🚀 Arquitectura de Despliegue Unificada (Docker)
+
+El proyecto SIMS ahora cuenta con una orquestación completa mediante **Docker Compose** en la raíz del repositorio. Esto permite levantar todo el ecosistema con un único comando.
+
+### Requisitos Previos
+- Docker Desktop 4.x+
+- Docker Compose v2.x+
+
+### Inicio Rápido (Todo el Sistema)
+Para levantar todos los servicios en modo desarrollo:
+
+```bash
+# 1. Situarse en la raíz del proyecto
+# 2. Levantar todos los contenedores
+docker compose up -d --build
+
+# 3. Inicializar la base de datos y cargar datos de prueba
+docker exec sims-backend php artisan migrate:fresh --seed
+```
+
+### Servicios y Puertos
+| Servicio | Contenedor | Puerto Local | Descripción |
+|----------|------------|--------------|-------------|
+| **Frontend** | `sims-frontend` | [5173](http://localhost:5173) | Vue 3 + Vite (HMR activo) |
+| **Backend** | `sims-backend` | [8000](http://localhost:8000) | Laravel 12 API |
+| **Base de Datos**| `sims-db` | 5432 | PostgreSQL 15 |
+| **IoT Server** | `sims-iot-server` | [8001](http://localhost:8001) | FastAPI (Raspberry_py) |
+
+---
+
 ## Descripción General
 
 SIMS es una plataforma integral para la gestión y monitorización de movilidad sostenible (carsharing eléctrico). Integra sensores IoT, un backend robusto y un frontend web para usuarios y administradores.
@@ -111,7 +141,7 @@ SIMS es una plataforma integral para la gestión y monitorización de movilidad 
 
 ---
 
-## Inicio Rápido
+## Inicio Rápido (Legacy - Sin Docker Global)
 
 ### Backend
 ```bash
@@ -370,4 +400,3 @@ EUPL v1.2 (European Union Public Licence)
 
 **Equipo de Desarrollo SIMS**  
 *Última actualización: 2026-03-03*
-
