@@ -15,9 +15,9 @@ SIMS es una plataforma integral para la gestión y monitorización de movilidad 
 
 | Componente | README | Documentación Detallada |
 |------------|--------|-------------------------|
-| **Backend (Laravel)** | [project-sims-backend/README.md](project-sims-backend/README.md) | [project-sims-backend/docs/](project-sims-backend/docs/) |
-| **Frontend (Vue)** | [project-sims-frontend/README.md](project-sims-frontend/README.md) | [project-sims-frontend/docs/](project-sims-frontend/docs/) |
-| **IoT (Raspberry Pi)** | [Raspberry_py/README.md](Raspberry_py/README.md) | [Raspberry_py/ESTADO_SUBSISTEMA_IOT.md](Raspberry_py/ESTADO_SUBSISTEMA_IOT.md) |
+| **Backend (Laravel)** | [../project-sims-backend/README.md](../project-sims-backend/README.md) | [../project-sims-backend/docs/](../project-sims-backend/docs/) |
+| **Frontend (Vue)** | [../project-sims-frontend/README.md](../project-sims-frontend/README.md) | [../project-sims-frontend/docs/](../project-sims-frontend/docs/) |
+| **IoT (Raspberry Pi)** | [../Raspberry_py/README.md](../Raspberry_py/README.md) | [../Raspberry_py/ESTADO_SUBSISTEMA_IOT.md](../Raspberry_py/ESTADO_SUBSISTEMA_IOT.md) |
 
 ---
 
@@ -44,14 +44,14 @@ SIMS es una plataforma integral para la gestión y monitorización de movilidad 
 | Componente | Tecnología | Versión |
 |------------|------------|---------|
 | Backend | Laravel (PHP) | 12.x / 8.2+ |
-| Frontend | Vue + TypeScript | 3.5.26 / 5.9.3 |
-| CSS | TailwindCSS | 4.1.18 |
+| Frontend | Vue + TypeScript | 3.5.x / 5.x |
+| CSS | TailwindCSS | 4.x |
 | Mapas | Leaflet | 1.9.4 |
 | IoT Server | FastAPI (Python) | 3.9+ |
 | BD Relacional | PostgreSQL | 15 |
 | BD NoSQL | MongoDB Atlas | - |
-| Auth | Laravel Sanctum | 4.2 |
-| RBAC | Spatie Permission | 6.24 |
+| Auth | Laravel Sanctum | 4.x |
+| RBAC | Spatie Permission | 6.x |
 
 ---
 
@@ -62,30 +62,34 @@ SIMS es una plataforma integral para la gestión y monitorización de movilidad 
 | Funcionalidad | Backend | Frontend | IoT |
 |---------------|---------|----------|-----|
 | Autenticación (login/registro) | ✅ | ✅ | - |
-| Sistema RBAC (3 roles, 15 permisos) | ✅ | ✅ | - |
+| Sistema RBAC (3 roles, 15+ permisos) | ✅ | ✅ | - |
 | CRUD Usuarios | ✅ | ✅ | - |
 | CRUD Vehículos | ✅ | ✅ | - |
 | CRUD Roles/Permisos | ✅ | ✅ | - |
 | Sistema de Reservas | ✅ | ✅ | - |
 | Sistema de Tickets | ✅ | ✅ | - |
-| Chatbot con IA | ✅ | ✅ | - |
+| Chatbot con IA (Gemini) | ✅ | ✅ | - |
 | Mapas con Leaflet | ✅ | ✅ | - |
 | Mapa público sin auth | ✅ | ✅ | - |
 | Control IoT (on/off) | ✅ | ✅ | ✅ |
 | Telemetría GPS | ✅ | ✅ | ✅ |
 | Rate Limiting | ✅ | - | - |
-| Tests automatizados | ✅ (51+) | - | - |
+| Tests automatizados | ✅ (14+) | - | - |
 | Docker | ✅ | ✅ | ✅ |
+| Landing page pública | ✅ | - | - |
+| Imágenes por modelo de vehículo | ✅ | ✅ | - |
+| Distancia a ubicación del usuario | - | ✅ | - |
 
-### ⚠️ Pendiente / Mejoras
+### ⚠️ Pendiente / Mejoras Futuras
 
-| Tarea | Prioridad |
-|-------|-----------|
-| Laravel Telescope | Media |
-| Sentry (error tracking) | Media |
-| SSL/TLS para WebSocket | Media |
-| OpenAPI/Swagger | Baja |
-| Tests E2E Frontend | Baja |
+| Tarea | Prioridad | Descripción |
+|-------|-----------|-------------|
+| Laravel Telescope | Media | Monitorización de requests y queries |
+| Sentry | Media | Error tracking en producción |
+| SSL/TLS WebSocket | Media | Seguridad en comunicación IoT |
+| OpenAPI/Swagger | Baja | Documentación interactiva de API |
+| Tests E2E Frontend | Baja | Tests con Cypress o Playwright |
+| PWA | Baja | Aplicación web progresiva |
 
 ---
 
@@ -131,37 +135,62 @@ docker-compose up --build
 
 | Tipo | Cantidad | Documentación |
 |------|----------|---------------|
-| Públicos | 3 | login, register, public map |
-| Cliente | 25+ | perfil, vehículos, reservas, tickets, chatbot, IoT |
-| Admin | 30+ | CRUD completo, comandos IoT |
+| Públicos | 4 | login, register, public map, landing |
+| Cliente | 25+ | perfil, vehículos, reservas, tickets, chatbot |
+| Admin | 30+ | CRUD completo, comandos IoT, health checks |
 
-Ver detalles en: [project-sims-backend/docs/API_ENDPOINTS.md](project-sims-backend/docs/API_ENDPOINTS.md)
+Ver detalles en: [../project-sims-backend/docs/API_ENDPOINTS.md](../project-sims-backend/docs/API_ENDPOINTS.md)
 
 ---
 
 ## Componentes Verificados
 
 **Backend (Laravel 12.x):**
-- 11 controladores
-- 7 modelos
+- 12 controladores (8 principales + 4 API)
+- 7 modelos (User, Vehicle, Rental, Ticket, TicketMessage, Role, Permission)
 - 5 policies
 - 4 form requests
 - 1 service (VehicleLocationService)
-- 8 seeders
-- 51+ tests
+- 6 seeders
+- 14+ tests
 
-**Frontend (Vue 3.5.26):**
-- 6 módulos
-- 30+ páginas
-- 15+ componentes
-- 2 layouts
-- 2 servicios API
+**Frontend (Vue 3.x):**
+- 6 módulos (admin, auth, bookings, common, map, tickets)
+- 58 componentes Vue
+- 2 layouts (AdminLayout, AuthLayout)
+- 2 servicios API (api.ts, authService.ts)
+- Composables (useMap, useGeolocation)
 
 **IoT (FastAPI):**
-- 1 servidor WebSocket/REST
+- 1 servidor WebSocket/REST (main.py)
 - 1 agente Raspberry Pi
-- 6 endpoints
-- Telemetría GPS, motor, batería
+- 5 endpoints
+- Telemetría: GPS, motor, batería
+
+---
+
+## Ubicación de Archivos Importantes
+
+```
+SIMS_SPRINT4/
+├── profile/
+│   └── readme.md              # Este archivo
+├── project-sims-backend/
+│   ├── README.md              # Documentación backend
+│   ├── docs/                  # Docs detalladas
+│   │   └── API_ENDPOINTS.md   # Referencia de endpoints
+│   ├── public/logo.png        # Logo del proyecto
+│   └── .env                   # Configuración
+├── project-sims-frontend/
+│   ├── README.md              # Documentación frontend
+│   ├── docs/                  # Docs detalladas
+│   └── public/logo.png        # Logo del proyecto
+└── Raspberry_py/
+    ├── README.md              # Documentación IoT
+    ├── ESTADO_SUBSISTEMA_IOT.md # Estado detallado
+    ├── server/                # Servidor FastAPI
+    └── agent/                 # Agente Raspberry Pi
+```
 
 ---
 
