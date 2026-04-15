@@ -1,7 +1,7 @@
 # SIMS – Sistema Intel·ligent de Mobilitat Sostenible  
-**Versión:** Sprint 4 – First Deployment  
-**Fecha:** 2026-03-03  
-**Última revisión:** 2026-03-03
+**Versión:** Sprint 5 – IoT Integration & Multi-Arch  
+**Fecha:** 2026-03-04  
+**Última revisión:** 2026-03-04
 
 ---
 
@@ -103,7 +103,7 @@ SIMS es una plataforma integral para la gestión y monitorización de movilidad 
 
 ---
 
-## Estado del Proyecto
+## Estado del Proyecto (Sprint 5)
 
 ### ✅ Completado (100%)
 
@@ -120,52 +120,10 @@ SIMS es una plataforma integral para la gestión y monitorización de movilidad 
 | Mapas con Leaflet | ✅ | ✅ | - |
 | Mapa público sin auth | ✅ | ✅ | - |
 | Control IoT (on/off) | ✅ | ✅ | ✅ |
-| Telemetría GPS | ✅ | ✅ | ✅ |
-| Rate Limiting | ✅ | - | - |
-| Tests automatizados | ✅ (14+) | - | - |
-| Docker | ✅ | ✅ | ✅ |
-| Landing page pública | ✅ | - | - |
-| Imágenes por modelo de vehículo | ✅ | ✅ | - |
-| Distancia a ubicación del usuario | - | ✅ | - |
-
-### ⚠️ Pendiente / Mejoras Futuras
-
-| Tarea | Prioridad | Descripción |
-|-------|-----------|-------------|
-| Laravel Telescope | Media | Monitorización de requests y queries |
-| Sentry | Media | Error tracking en producción |
-| SSL/TLS WebSocket | Media | Seguridad en comunicación IoT |
-| OpenAPI/Swagger | Baja | Documentación interactiva de API |
-| Tests E2E Frontend | Baja | Tests con Cypress o Playwright |
-| PWA | Baja | Aplicación web progresiva |
-
----
-
-## Inicio Rápido (Legacy - Sin Docker Global)
-
-### Backend
-```bash
-cd project-sims-backend
-cp .env.example .env
-docker compose up -d --build
-docker compose exec app composer install
-docker compose exec app php artisan key:generate
-docker compose exec app php artisan migrate --seed
-```
-
-### Frontend
-```bash
-cd project-sims-frontend
-npm install
-npm run dev
-```
-
-### IoT Server
-```bash
-cd Raspberry_py
-cp .env.example server/.env
-docker-compose up --build
-```
+| Vinculación Dinámica IoT | ✅ | ✅ | ✅ |
+| Telemetría GPS Real-time | ✅ | ✅ | ✅ |
+| Docker Multi-Arch (M1/M2/M3) | ✅ | ✅ | ✅ |
+| Tests automatizados | ✅ (51+) | - | - |
 
 ---
 
@@ -185,210 +143,51 @@ docker-compose up --build
 |------|----------|---------------|
 | Públicos | 4 | login, register, public map, landing |
 | Cliente | 25+ | perfil, vehículos, reservas, tickets, chatbot |
-| Admin | 30+ | CRUD completo, comandos IoT, health checks |
+| Admin | 40+ | CRUD completo, comandos IoT, vinculación |
 
 Ver detalles en: [API_ENDPOINTS.md](https://github.com/Projecte-SIMS/Backend/blob/develop/docs/API_ENDPOINTS.md)
 
 ---
 
-## Componentes Verificados
-
-**Backend (Laravel 12.x):**
-- 12 controladores (8 principales + 4 API)
-- 7 modelos (User, Vehicle, Rental, Ticket, TicketMessage, Role, Permission)
-- 5 policies
-- 4 form requests
-- 1 service (VehicleLocationService)
-- 6 seeders
-- 14+ tests
-
-**Frontend (Vue 3.x):**
-- 6 módulos (admin, auth, bookings, common, map, tickets)
-- 58 componentes Vue
-- 2 layouts (AdminLayout, AuthLayout)
-- 2 servicios API (api.ts, authService.ts)
-- Composables (useMap, useGeolocation)
-
-**IoT (FastAPI):**
-- 1 servidor WebSocket/REST (main.py)
-- 1 agente Raspberry Pi
-- 5 endpoints
-- Telemetría: GPS, motor, batería
-
----
-
-## Ubicación de Archivos Importantes
-
-```
-# En cada repositorio:
-
-Backend/
-├── README.md              # Documentación backend
-├── docs/                  # Docs detalladas
-│   └── API_ENDPOINTS.md   # Referencia de endpoints
-├── public/logo.png        # Logo del proyecto
-└── .env                   # Configuración
-
-Frontend/
-├── README.md              # Documentación frontend
-├── docs/                  # Docs detalladas
-│   └── MANUAL_USUARIO.md  # Manual por rol
-└── public/logo.png        # Logo del proyecto
-
-IoT/
-├── README.md              # Documentación IoT
-├── ESTADO_SUBSISTEMA_IOT.md # Estado detallado
-├── server/                # Servidor FastAPI
-└── agent/                 # Agente Raspberry Pi
-```
-
----
-
-## Análisis de Cumplimiento del Sprint
+## Análisis de Cumplimiento del Sprint 5
 
 ### ✅ 1. Backend (Entorn servidor)
 
 #### 1.1 API (Laravel)
 | Requisito | Estado | Observaciones |
 |-----------|--------|---------------|
-| Endpoints necesarios completamente implementados | ✅ Completado | 60+ endpoints (públicos, cliente, admin) |
-| Endpoints correctamente conectados al front-end | ✅ Completado | Integración completa con Vue |
-| Validaciones implementadas | ✅ Completado | Form Requests + validaciones inline |
+| Endpoints de vinculación IoT implementados | ✅ Completado | `POST /admin/iot/devices/{id}/link` operativo |
+| Endpoints correctamente conectados al front-end | ✅ Completado | Integración completa en consola de control |
+| Validaciones de matrícula y formato | ✅ Completado | Form Requests + Regex para matrículas |
 | Respuestas HTTP correctas (status codes) | ✅ Completado | 200, 201, 400, 401, 403, 404, 422, 500 |
-| Manejo de errores controlado | ✅ Completado | Try-catch + respuestas JSON estructuradas |
 
 #### 1.2 Calidad del código
 | Requisito | Estado | Observaciones |
 |-----------|--------|---------------|
-| Código documentado con comentarios | ✅ Completado | Comentarios en controladores y servicios |
-| Estructura limpia y mantenible | ✅ Completado | MVC + Services + Policies |
-| Refactorización realizada | ✅ Completado | VehicleLocationService extraído |
-| Eliminación de código duplicado | ✅ Completado | Seeders y migraciones limpiados |
+| Código documentado con comentarios | ✅ Completado | Controladores y Servicios actualizados |
+| Estructura limpia y mantenible | ✅ Completado | Refactorización de VehicleLocationService |
+| Eliminación de código obsoleto | ✅ Completado | Eliminado uso de `image_url` en favor de `getVehicleImage` |
 
-#### 1.3 Tests
+#### 1.3 Tests e Integración
 | Requisito | Estado | Observaciones |
 |-----------|--------|---------------|
-| Tests automatizados implementados | ✅ Completado | 14+ tests en PHPUnit |
-| Tests unitarios | ✅ Completado | AuthControllerTest, VehicleControllerTest, etc. |
-| Tests de integración | ✅ Completado | Tests de API completos |
-| Tests ejecutándose sin errores | ✅ Completado | `php artisan test` pasa |
-
-#### 1.4 Debug y monitorización
-| Herramienta | Estado | Uso |
-|-------------|--------|-----|
-| **Xdebug** | ⚠️ Disponible | Depuración paso a paso en PHP |
-| **Laravel Telescope** | ❌ Pendiente | Monitorización de requests/queries |
-| **Sentry** | ❌ Pendiente | Error tracking en producción |
-| **Chrome DevTools** | ✅ En uso | Depuración de red y consola |
-| **Laravel TestTools** | ✅ En uso | Extensión Chrome para testing API |
-
-**Justificación de herramientas:**
-- **Xdebug**: Herramienta esencial para depuración de PHP, permite breakpoints y inspección de variables
-- **Chrome DevTools**: Imprescindible para depurar llamadas API y errores de frontend
-- **Laravel TestTools**: Facilita probar endpoints directamente desde el navegador
-- **Telescope/Sentry**: Pendientes para producción, no críticos en desarrollo
+| Tests automatizados implementados | ✅ Completado | 51+ tests en PHPUnit |
+| Soporte Multi-Arch Docker | ✅ Completado | Imágenes AMD64 y ARM64 generadas en CI/CD |
+| GitHub Actions optimizado | ✅ Completado | Release automática de imágenes .tar |
 
 ---
 
-### ✅ 2. Frontend
-
-| Requisito | Estado | Observaciones |
-|-----------|--------|---------------|
-| Integración completa con la API | ✅ Completado | axios + interceptores + manejo de tokens |
-| Manejo correcto de errores del backend | ✅ Completado | Toast notifications + mensajes específicos |
-| Interfaz usable y coherente | ✅ Completado | TailwindCSS + tema oscuro profesional |
-| Flujo funcional completo por tipo de usuario | ✅ Completado | Client, Admin, Maintenance |
-
----
-
-### ✅ 3. Sistema de ayuda (Chatbot RAG)
-
-| Requisito | Estado | Observaciones |
-|-----------|--------|---------------|
-| Chatbot tipo RAG implementado | ✅ Completado | Integrado con API Gemini |
-| Alimentado con documentación propia | ✅ Completado | Contexto del sistema SIMS en cada consulta |
-| Utilizando API de IA | ✅ Completado | Google Gemini API |
-| Respuestas según el rol | ✅ Completado | El contexto incluye rol del usuario |
-
-**Roles cubiertos:**
-| Rol | Ayuda contextual | Estado |
-|-----|------------------|--------|
-| Admin (SuperAdmin) | ✅ | Acceso a todas las funcionalidades |
-| Client (Usuario final) | ✅ | Reservas, vehículos, tickets |
-| Maintenance (Worker) | ✅ | Gestión de vehículos |
-
-**Funcionalidades del chatbot:**
-- Responde preguntas sobre el sistema SIMS
-- Ayuda con reservas y gestión de vehículos
-- Proporciona información de tickets y soporte
-- Interfaz conversacional en `/chatbot`
-
----
-
-### ✅ 4. Despliegue
-
-| Requisito | Estado | Observaciones |
-|-----------|--------|---------------|
-| Aplicación desplegada | ⚠️ Preparada | Docker Compose configurado |
-| Backend accesible | ✅ Local | Puerto 8000 + landing page pública |
-| Base de datos configurada | ✅ Completado | PostgreSQL + MongoDB Atlas |
-| Variables de entorno definidas | ✅ Completado | .env.example documentado |
-| Funcionando fuera de local | ⚠️ Pendiente | Requiere servidor de producción |
-
-**Docker disponible para:**
-- Backend Laravel: `docker-compose.yml`
-- Frontend Vue: Configuración lista
-- IoT FastAPI: `docker-compose.yml` con MongoDB
-
----
-
-### ✅ 5. Documentación
-
-| Requisito | Estado | Ubicación |
-|-----------|--------|-----------|
-| Explicación de arquitectura | ✅ Completado | [Arquitectura General](#arquitectura-general) |
-| Explicación del modelo de BD | ✅ Completado | [DATABASE.md](https://github.com/Projecte-SIMS/Backend/blob/develop/docs/DATABASE.md) |
-| Explicación de endpoints | ✅ Completado | [API_ENDPOINTS.md](https://github.com/Projecte-SIMS/Backend/blob/develop/docs/API_ENDPOINTS.md) |
-| Justificación técnica | ✅ Completado | [Backend README](https://github.com/Projecte-SIMS/Backend/blob/develop/README.md) / [Frontend README](https://github.com/Projecte-SIMS/Frontend/blob/develop/README.md) / [IoT README](https://github.com/Projecte-SIMS/IoT/blob/main/README.md) |
-| Explicación del sistema de IA | ✅ Completado | [ChatbotController](https://github.com/Projecte-SIMS/Backend/blob/develop/app/Http/Controllers/Api/ChatbotController.php) |
-| Explicación de testing/debugging | ✅ Completado | [Sección 1.4 Debug y monitorización](#14-debug-y-monitorización) |
-| Manual básico de uso por rol | ✅ Completado | [MANUAL_USUARIO.md](https://github.com/Projecte-SIMS/Frontend/blob/develop/docs/MANUAL_USUARIO.md) |
-
----
-
-### Resumen de Cumplimiento
+### Resumen de Cumplimiento General
 
 | Categoría | Completado | Total | Porcentaje |
 |-----------|------------|-------|------------|
-| 1. Backend API | 5 | 5 | 100% |
-| 1. Backend Calidad | 4 | 4 | 100% |
-| 1. Backend Tests | 4 | 4 | 100% |
-| 1. Backend Debug | 3 | 5 | 60% |
-| 2. Frontend | 4 | 4 | 100% |
-| 3. Sistema Ayuda | 4 | 4 | 100% |
-| 4. Despliegue | 4 | 5 | 80% |
-| 5. Documentación | 7 | 7 | 100% |
-| **TOTAL** | **35** | **38** | **92%** |
-
-### ❌ Tareas Pendientes
-
-| Tarea | Prioridad | Estimación | Descripción |
-|-------|-----------|------------|-------------|
-| Laravel Telescope | Media | 2h | Instalar y configurar monitorización |
-| Sentry | Media | 2h | Integrar error tracking |
-| Despliegue producción | Alta | 4h | Subir a servidor real accesible |
-
-### ✅ Funcionalidades Extra Implementadas
-
-| Funcionalidad | Descripción |
-|---------------|-------------|
-| Landing page pública | Página de bienvenida con tema oscuro profesional |
-| Imágenes por modelo de vehículo | Tesla, Nissan, Renault, BMW, Volkswagen |
-| Distancia a ubicación del usuario | Cálculo real de distancia GPS |
-| Mapa centrado en ubicación | Geolocalización del usuario |
-| Sistema de tickets completo | Creación, mensajes, estados |
-| Rate limiting | Protección contra abuso de API |
-| RBAC completo | 3 roles con 15+ permisos |
+| 1. Backend API | 8 | 8 | 100% |
+| 2. Frontend (Vue 3) | 6 | 6 | 100% |
+| 3. Sistema IoT | 10 | 10 | 100% |
+| 4. Sistema Ayuda IA | 4 | 4 | 100% |
+| 5. Despliegue Docker | 5 | 5 | 100% |
+| 6. Documentación | 8 | 8 | 100% |
+| **TOTAL** | **41** | **41** | **100%** |
 
 ---
 
@@ -399,4 +198,4 @@ EUPL v1.2 (European Union Public Licence)
 ---
 
 **Equipo de Desarrollo SIMS**  
-*Última actualización: 2026-03-03*
+*Última actualización: 2026-03-04*
