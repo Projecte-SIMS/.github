@@ -57,8 +57,16 @@ jobs:
             sleep 60
             
             if [ "$(docker inspect -f '{{.State.Running}}' sims-backend)" = "true" ]; then
+                echo "🚀 Ejecutando migraciones base..."
                 docker exec sims-backend php artisan migrate --force || echo "⚠️ Falló migración base"
-                docker exec sims-backend php artisan tenants:migrate --force || echo "⚠️ Falló migración multitenant"
+                
+                echo "🚀 Ejecutando migraciones multitenant..."
+                if ! docker exec sims-backend php artisan tenants:migrate --force; then
+                    echo "⚠️ No se encontraron inquilinos. Inicializando inquilino 'demo'..."
+                    docker exec sims-backend php artisan db:seed --class=CentralSeeder
+                    echo "🔄 Reintentando migración multitenant..."
+                    docker exec sims-backend php artisan tenants:migrate --force
+                fi
             else
                 echo "❌ Error: El contenedor sims-backend no está en ejecución."
                 docker logs sims-backend --tail 50
