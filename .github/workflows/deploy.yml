@@ -12,7 +12,7 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     
     steps:
-      - name: Desplegar Releases en Servidor vía SSH
+      - name: Reconstruir y Desplegar en Servidor vía SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -21,19 +21,24 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           command_timeout: 30m
           script: |
-            echo "🚀 Iniciando actualización resiliente..."
+            echo "🚀 Iniciando reconstrucción total del sistema..."
             
-            # 1. Localizar el directorio del proyecto
+            # 1. Crear y asegurar directorio del proyecto
             PROJECT_ROOT="/home/${{ secrets.SSH_USER }}/sims-project"
-            if [ ! -d "$PROJECT_ROOT" ]; then
-              PROJECT_ROOT="$HOME/sims-project"
-            fi
-            
-            cd "$PROJECT_ROOT" || { echo "❌ Carpeta del proyecto no encontrada en $PROJECT_ROOT"; exit 1; }
-            echo "📍 Directorio actual: $(pwd)"
-            ls -F
+            mkdir -p "$PROJECT_ROOT"
+            cd "$PROJECT_ROOT" || exit 1
 
-            # 2. Función para streaming directo a Docker
+            # 2. Obtener el archivo docker-compose.prod.yml más reciente
+            # Lo descargamos del repositorio principal (asumiendo que es público)
+            echo "📄 Descargando configuración Docker Compose..."
+            curl -sL https://raw.githubusercontent.com/Projecte-SIMS/.github/main/docker-compose.prod.yml -o docker-compose.prod.yml
+            
+            # Si el anterior falló (ruta distinta), intentamos otra común
+            if [ ! -s docker-compose.prod.yml ]; then
+                curl -sL https://raw.githubusercontent.com/Projecte-SIMS/Backend/main/docker-compose.prod.yml -o docker-compose.prod.yml
+            fi
+
+            # 3. Función para streaming de imágenes
             stream_component() {
               NAME=$1
               REPO=$2
@@ -51,32 +56,14 @@ jobs:
             stream_component "Frontend" "Frontend"
             stream_component "IoT" "IoT"
 
-            echo "🔄 Reiniciando contenedores..."
-            # Detección explícita del archivo
-            if [ -f "docker-compose.prod.yml" ]; then
-                CONF="docker-compose.prod.yml"
-            elif [ -f "docker-compose.yml" ]; then
-                CONF="docker-compose.yml"
-            else
-                # Buscar cualquier archivo que parezca un docker-compose
-                CONF=$(ls docker-compose*.yml 2>/dev/null | head -n 1)
-            fi
-
-            if [ -z "$CONF" ]; then
-                echo "❌ Error: No se encontró ningún archivo docker-compose en $(pwd)"
-                ls -la
-                exit 1
-            fi
-
-            echo "📁 Usando archivo: $CONF"
-            docker compose -f "$CONF" up -d
+            echo "🔄 Levantando contenedores..."
+            docker compose -f docker-compose.prod.yml up -d
 
             echo "⚙️ Ejecutando migraciones..."
-            # Esperar a que el backend esté arriba
-            sleep 15
+            sleep 20
             docker exec sims-backend php artisan migrate --force || echo "⚠️ Falló migración base"
             docker exec sims-backend php artisan tenants:migrate --force || echo "⚠️ Falló migración multitenant"
 
             echo "✨ Limpieza final..."
             docker image prune -f
-            echo "✅ ¡Actualización completada con éxito!"
+            echo "✅ ¡Sistema reconstruido y actualizado!"
