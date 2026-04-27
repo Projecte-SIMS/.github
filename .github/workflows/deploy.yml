@@ -12,7 +12,7 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     
     steps:
-      - name: Reconstruir y Desplegar con .env existente
+      - name: Reconstruir y Desplegar con recuperación de .env
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -21,42 +21,47 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           command_timeout: 30m
           script: |
-            echo "🚀 Iniciando reconstrucción y recuperación de .env..."
+            echo "🚀 Iniciando despliegue con búsqueda de configuración..."
             
-            # 1. Preparar directorios
             PROJECT_ROOT="$HOME/sims-project"
             mkdir -p "$PROJECT_ROOT/project-sims-backend"
             mkdir -p "$PROJECT_ROOT/project-sims-frontend"
 
-            # 2. Intentar recuperar el .env actual del servidor
-            echo "🔍 Buscando archivo .env existente..."
-            if [ -f "$HOME/project-sims-backend/.env" ]; then
-                cp "$HOME/project-sims-backend/.env" "$PROJECT_ROOT/project-sims-backend/.env"
-                echo "✅ .env recuperado desde ~/project-sims-backend/.env"
-            else
-                echo "⚠️ No se encontró .env en la ruta indicada. Buscando en el resto del servidor..."
-                FOUND_ENV=$(find $HOME -name ".env" -not -path "*/sims-project/*" | head -n 1)
-                if [ ! -z "$FOUND_ENV" ]; then
-                    cp "$FOUND_ENV" "$PROJECT_ROOT/project-sims-backend/.env"
-                    echo "✅ .env recuperado desde $FOUND_ENV"
-                else
-                    echo "❌ No se encontró ningún archivo .env en el servidor."
+            echo "🔍 Localizando archivo .env..."
+            # 1. Si está en la raíz de sims-project, moverlo a la carpeta del backend
+            if [ -f "$PROJECT_ROOT/.env" ]; then
+                mv "$PROJECT_ROOT/.env" "$PROJECT_ROOT/project-sims-backend/.env"
+                echo "✅ .env movido de la raíz a project-sims-backend/"
+            fi
+
+            # 2. Si no está, buscar en las rutas probables que vimos en el ls
+            if [ ! -f "$PROJECT_ROOT/project-sims-backend/.env" ]; then
+                if [ -f "$HOME/.env" ]; then
+                    cp "$HOME/.env" "$PROJECT_ROOT/project-sims-backend/.env"
+                    echo "✅ .env copiado desde $HOME"
+                elif [ -f "$HOME/project-sims-backend/.env" ]; then
+                    cp "$HOME/project-sims-backend/.env" "$PROJECT_ROOT/project-sims-backend/.env"
+                    echo "✅ .env copiado desde carpeta backend externa"
                 fi
             fi
 
-            # 3. Descargar configuración Docker Compose
+            # Asegurar que el .env del frontend también existe (aunque sea vacío o básico)
+            if [ ! -f "$PROJECT_ROOT/project-sims-frontend/.env" ]; then
+                echo "VITE_API_URL=http://185.13.77.175:8000/api" > "$PROJECT_ROOT/project-sims-frontend/.env"
+            fi
+
             cd "$PROJECT_ROOT"
-            echo "📄 Descargando docker-compose.prod.yml..."
+            echo "📄 Descargando docker-compose.prod.yml actualizado..."
             curl -sL https://raw.githubusercontent.com/Projecte-SIMS/.github/main/docker-compose.prod.yml -o docker-compose.prod.yml
 
-            # 4. Streaming de imágenes
+            # Streaming de imágenes
             stream_component() {
               NAME=$1
               REPO=$2
               URL=$(curl -s https://api.github.com/repos/Projecte-SIMS/$REPO/releases/latest | grep "browser_download_url.*-amd64\.tar" | cut -d '"' -f 4 | head -n 1)
               
               if [ ! -z "$URL" ]; then
-                echo "📥 Transmitiendo $NAME desde $URL..."
+                echo "📥 Transmitiendo $NAME..."
                 curl -L "$URL" | docker load
               else
                 echo "⚠️ No se encontró release de $NAME"
@@ -77,4 +82,4 @@ jobs:
 
             echo "✨ Limpieza final..."
             docker image prune -f
-            echo "✅ ¡Sistema reconstruido y actualizado!"
+            echo "✅ ¡Despliegue finalizado!"
