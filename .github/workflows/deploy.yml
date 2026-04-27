@@ -52,9 +52,18 @@ jobs:
             docker compose -f docker-compose.prod.yml up -d --no-build
 
             echo "⚙️ Ejecutando migraciones..."
-            sleep 20
-            docker exec sims-backend php artisan migrate --force || echo "⚠️ Reintentando..."
-            docker exec sims-backend php artisan tenants:migrate --force || echo "⚠️ Falló migración"
+            # Esperar a que el sistema esté realmente listo
+            echo "⏳ Esperando 60 segundos a que los servicios se estabilicen..."
+            sleep 60
+            
+            if [ "$(docker inspect -f '{{.State.Running}}' sims-backend)" = "true" ]; then
+                docker exec sims-backend php artisan migrate --force || echo "⚠️ Falló migración base"
+                docker exec sims-backend php artisan tenants:migrate --force || echo "⚠️ Falló migración multitenant"
+            else
+                echo "❌ Error: El contenedor sims-backend no está en ejecución."
+                docker logs sims-backend --tail 50
+                exit 1
+            fi
 
             echo "✨ Limpieza final..."
             docker image prune -f
