@@ -1,0 +1,82 @@
+services:
+  # Backend Laravel
+  backend:
+    build:
+      context: ./project-sims-backend
+    image: sims-backend:latest
+    container_name: sims-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./project-sims-backend:/var/www/html
+      - backend_vendor:/var/www/html/vendor
+    working_dir: /var/www/html
+    environment:
+      - IOT_MICROSERVICE_URL=http://iot-server:8000
+    env_file:
+      - ./project-sims-backend/.env
+    depends_on:
+      db:
+        condition: service_healthy
+      iot-server:
+        condition: service_started
+    command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+    networks:
+      - sims-network
+
+  # Base de Datos PostgreSQL
+  db:
+    image: postgres:15
+    container_name: sims-db
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-project_sims}
+      POSTGRES_USER: ${DB_USERNAME:-project_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-supersecret}
+    env_file:
+      - ./project-sims-backend/.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - sims-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-project_user} -d ${DB_DATABASE:-project_sims}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Microservicio IoT (Raspberry_py server)
+  iot-server:
+    build:
+      context: ./Raspberry_py/server
+    image: sims-iot-server:latest
+    container_name: sims-iot-server
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./Raspberry_py/server:/app
+    env_file:
+      - ./Raspberry_py/server/.env
+    networks:
+      - sims-network
+
+  # Frontend Vue 3 (Producción)
+  frontend:
+    build:
+      context: ./project-sims-frontend
+      target: production
+    image: sims-frontend:latest
+    container_name: sims-frontend
+    ports:
+      - "80:80"
+    networks:
+      - sims-network
+
+volumes:
+  postgres_data:
+  backend_vendor:
+
+networks:
+  sims-network:
+    driver: bridge
