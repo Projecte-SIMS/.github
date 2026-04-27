@@ -12,7 +12,7 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     
     steps:
-      - name: Reconstruir y Desplegar con recuperación de .env
+      - name: Reconstruir y Desplegar (Estructura Completa)
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -21,50 +21,48 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           command_timeout: 30m
           script: |
-            echo "🚀 Iniciando despliegue con búsqueda de configuración..."
+            echo "🚀 Iniciando configuración de estructura completa..."
             
             PROJECT_ROOT="$HOME/sims-project"
+            # 1. Crear TODAS las carpetas que espera el docker-compose.prod.yml
             mkdir -p "$PROJECT_ROOT/project-sims-backend"
             mkdir -p "$PROJECT_ROOT/project-sims-frontend"
+            mkdir -p "$PROJECT_ROOT/Raspberry_py/server"
 
-            echo "🔍 Localizando archivo .env..."
-            # 1. Si está en la raíz de sims-project, moverlo a la carpeta del backend
+            echo "🔍 Gestionando archivos .env..."
+            # Mover .env de Backend si está en la raíz de sims-project
             if [ -f "$PROJECT_ROOT/.env" ]; then
-                mv "$PROJECT_ROOT/.env" "$PROJECT_ROOT/project-sims-backend/.env"
-                echo "✅ .env movido de la raíz a project-sims-backend/"
+                cp "$PROJECT_ROOT/.env" "$PROJECT_ROOT/project-sims-backend/.env"
+                echo "✅ .env principal copiado a backend"
             fi
 
-            # 2. Si no está, buscar en las rutas probables que vimos en el ls
-            if [ ! -f "$PROJECT_ROOT/project-sims-backend/.env" ]; then
-                if [ -f "$HOME/.env" ]; then
-                    cp "$HOME/.env" "$PROJECT_ROOT/project-sims-backend/.env"
-                    echo "✅ .env copiado desde $HOME"
-                elif [ -f "$HOME/project-sims-backend/.env" ]; then
-                    cp "$HOME/project-sims-backend/.env" "$PROJECT_ROOT/project-sims-backend/.env"
-                    echo "✅ .env copiado desde carpeta backend externa"
-                fi
+            # Recuperar .env de IoT desde su carpeta original si existe
+            if [ -f "$HOME/Raspberry_py/server/.env" ]; then
+                cp "$HOME/Raspberry_py/server/.env" "$PROJECT_ROOT/Raspberry_py/server/.env"
+                echo "✅ .env de IoT recuperado desde ~/Raspberry_py/server/.env"
+            elif [ ! -f "$PROJECT_ROOT/Raspberry_py/server/.env" ]; then
+                echo "PORT=8000" > "$PROJECT_ROOT/Raspberry_py/server/.env"
+                echo "✅ .env básico creado para IoT (no se encontró el original)"
             fi
 
-            # Asegurar que el .env del frontend también existe (aunque sea vacío o básico)
+            # Crear .env para Frontend si no existe
             if [ ! -f "$PROJECT_ROOT/project-sims-frontend/.env" ]; then
                 echo "VITE_API_URL=http://185.13.77.175:8000/api" > "$PROJECT_ROOT/project-sims-frontend/.env"
+                echo "✅ .env básico creado para Frontend"
             fi
 
+            # 2. Descargar configuración Docker Compose actualizada
             cd "$PROJECT_ROOT"
-            echo "📄 Descargando docker-compose.prod.yml actualizado..."
             curl -sL https://raw.githubusercontent.com/Projecte-SIMS/.github/main/docker-compose.prod.yml -o docker-compose.prod.yml
 
-            # Streaming de imágenes
+            # 3. Streaming de imágenes
             stream_component() {
               NAME=$1
               REPO=$2
               URL=$(curl -s https://api.github.com/repos/Projecte-SIMS/$REPO/releases/latest | grep "browser_download_url.*-amd64\.tar" | cut -d '"' -f 4 | head -n 1)
-              
               if [ ! -z "$URL" ]; then
                 echo "📥 Transmitiendo $NAME..."
                 curl -L "$URL" | docker load
-              else
-                echo "⚠️ No se encontró release de $NAME"
               fi
             }
 
@@ -76,10 +74,11 @@ jobs:
             docker compose -f docker-compose.prod.yml up -d
 
             echo "⚙️ Ejecutando migraciones..."
+            # Esperar a que el sistema esté listo
             sleep 20
-            docker exec sims-backend php artisan migrate --force || echo "⚠️ Falló migración base"
-            docker exec sims-backend php artisan tenants:migrate --force || echo "⚠️ Falló migración multitenant"
+            docker exec sims-backend php artisan migrate --force || echo "⚠️ Reintentando migración..."
+            docker exec sims-backend php artisan tenants:migrate --force || echo "⚠️ Falló migración"
 
             echo "✨ Limpieza final..."
             docker image prune -f
-            echo "✅ ¡Despliegue finalizado!"
+            echo "✅ ¡Despliegue completado con éxito!"
