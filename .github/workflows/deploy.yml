@@ -12,7 +12,7 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     
     steps:
-      - name: Reconstruir y Desplegar en Servidor vía SSH
+      - name: Reconstruir y Desplegar con .env existente
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -21,24 +21,35 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           command_timeout: 30m
           script: |
-            echo "🚀 Iniciando reconstrucción total del sistema..."
+            echo "🚀 Iniciando reconstrucción y recuperación de .env..."
             
-            # 1. Crear y asegurar directorio del proyecto
-            PROJECT_ROOT="/home/${{ secrets.SSH_USER }}/sims-project"
-            mkdir -p "$PROJECT_ROOT"
-            cd "$PROJECT_ROOT" || exit 1
+            # 1. Preparar directorios
+            PROJECT_ROOT="$HOME/sims-project"
+            mkdir -p "$PROJECT_ROOT/project-sims-backend"
+            mkdir -p "$PROJECT_ROOT/project-sims-frontend"
 
-            # 2. Obtener el archivo docker-compose.prod.yml más reciente
-            # Lo descargamos del repositorio principal (asumiendo que es público)
-            echo "📄 Descargando configuración Docker Compose..."
-            curl -sL https://raw.githubusercontent.com/Projecte-SIMS/.github/main/docker-compose.prod.yml -o docker-compose.prod.yml
-            
-            # Si el anterior falló (ruta distinta), intentamos otra común
-            if [ ! -s docker-compose.prod.yml ]; then
-                curl -sL https://raw.githubusercontent.com/Projecte-SIMS/Backend/main/docker-compose.prod.yml -o docker-compose.prod.yml
+            # 2. Intentar recuperar el .env actual del servidor
+            echo "🔍 Buscando archivo .env existente..."
+            if [ -f "$HOME/project-sims-backend/.env" ]; then
+                cp "$HOME/project-sims-backend/.env" "$PROJECT_ROOT/project-sims-backend/.env"
+                echo "✅ .env recuperado desde ~/project-sims-backend/.env"
+            else
+                echo "⚠️ No se encontró .env en la ruta indicada. Buscando en el resto del servidor..."
+                FOUND_ENV=$(find $HOME -name ".env" -not -path "*/sims-project/*" | head -n 1)
+                if [ ! -z "$FOUND_ENV" ]; then
+                    cp "$FOUND_ENV" "$PROJECT_ROOT/project-sims-backend/.env"
+                    echo "✅ .env recuperado desde $FOUND_ENV"
+                else
+                    echo "❌ No se encontró ningún archivo .env en el servidor."
+                fi
             fi
 
-            # 3. Función para streaming de imágenes
+            # 3. Descargar configuración Docker Compose
+            cd "$PROJECT_ROOT"
+            echo "📄 Descargando docker-compose.prod.yml..."
+            curl -sL https://raw.githubusercontent.com/Projecte-SIMS/.github/main/docker-compose.prod.yml -o docker-compose.prod.yml
+
+            # 4. Streaming de imágenes
             stream_component() {
               NAME=$1
               REPO=$2
