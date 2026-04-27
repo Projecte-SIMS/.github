@@ -21,17 +21,16 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           command_timeout: 30m
           script: |
-            echo "🚀 Iniciando actualización ultra-optimizada (Streaming)..."
-            cd ~/sims-project
+            echo "🚀 Iniciando actualización ultra-optimizada..."
             
-            echo "🧹 Limpieza agresiva inicial para liberar espacio..."
-            docker system prune -a -f --volumes || true
-            
-            echo "📊 Espacio en disco tras limpieza:"
+            # Definir ruta absoluta para evitar errores
+            PROJECT_DIR="/home/${{ secrets.SSH_USER }}/sims-project"
+            cd $PROJECT_DIR || { echo "❌ No se encontró la carpeta $PROJECT_DIR"; exit 1; }
+
+            echo "📊 Estado del disco:"
             df -h .
-            
-            # Función para procesar componente vía Pipe (Internet -> Docker)
-            # Esto NO guarda el archivo .tar en disco, ahorrando mucho espacio.
+
+            # Función para streaming directo a Docker
             stream_component() {
               NAME=$1
               REPO=$2
@@ -50,11 +49,20 @@ jobs:
             stream_component "IoT" "IoT"
 
             echo "🔄 Reiniciando contenedores..."
-            docker compose -f docker-compose.prod.yml up -d
+            # Buscar el archivo de compose dinámicamente si el nombre varía
+            COMPOSE_FILE="docker-compose.prod.yml"
+            if [ ! -f "$COMPOSE_FILE" ]; then
+                COMPOSE_FILE=$(ls docker-compose*.yml | head -n 1)
+            fi
+            
+            echo "📁 Usando archivo de configuración: $COMPOSE_FILE"
+            docker compose -f $COMPOSE_FILE up -d
 
-            echo "✨ Limpieza final..."
+            echo "⚙️ Ejecutando migraciones..."
+            docker exec sims-backend php artisan migrate --force || echo "⚠️ Error en migraciones base"
+            docker exec sims-backend php artisan tenants:migrate --force || echo "⚠️ Error en migraciones multitenant"
+
+            echo "✨ Limpieza final de imágenes huérfanas..."
             docker image prune -f
 
-            echo "📊 Espacio en disco final:"
-            df -h .
-            echo "✅ ¡Sistema actualizado con éxito mediante streaming!"
+            echo "✅ ¡Sistema actualizado y en marcha!"
