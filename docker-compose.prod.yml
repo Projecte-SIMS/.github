@@ -1,16 +1,11 @@
 services:
   # Backend Laravel
   backend:
-    build:
-      context: ./project-sims-backend
     image: sims-backend:latest-amd64
     container_name: sims-backend
     ports:
       - "8000:8000"
-    volumes:
-      - ./project-sims-backend:/var/www/html
-      - backend_vendor:/var/www/html/vendor
-    working_dir: /var/www/html
+    # Quitamos el volumen de ./project-sims-backend:/var/www/html
     environment:
       - IOT_MICROSERVICE_URL=http://iot-server:8000
     env_file:
@@ -48,24 +43,18 @@ services:
 
   # Microservicio IoT (Raspberry_py server)
   iot-server:
-    build:
-      context: ./Raspberry_py/server
     image: sims-iot-server:latest-amd64
     container_name: sims-iot-server
     ports:
       - "8001:8000"
-    volumes:
-      - ./Raspberry_py/server:/app
+    # Quitamos el volumen de ./Raspberry_py/server:/app
     env_file:
-      - ./Raspberry_py/server/.env
+      - ./project-sims-backend/.env # O el de IoT si prefieres
     networks:
       - sims-network
 
   # Frontend Vue 3 (Producción)
   frontend:
-    build:
-      context: ./project-sims-frontend
-      target: production
     image: sims-frontend:latest-amd64
     container_name: sims-frontend
     ports:
@@ -75,7 +64,6 @@ services:
 
 volumes:
   postgres_data:
-  backend_vendor:
 
 networks:
   sims-network:
