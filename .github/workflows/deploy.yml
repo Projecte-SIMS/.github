@@ -64,6 +64,12 @@ jobs:
                 if ! docker exec sims-backend php artisan tenants:migrate --force; then
                     echo "⚠️ No se encontraron inquilinos. Inicializando inquilino 'demo'..."
                     docker exec sims-backend php artisan db:seed --class=CentralSeeder
+                    
+                    echo "🔧 Forzando creación manual de esquema 'tenant_demo'..."
+                    # Intentamos crear el esquema directamente en Postgres por si el seeder no lo disparó
+                    docker exec sims-db psql -U postgres -c "CREATE SCHEMA IF NOT EXISTS tenant_demo;" || \
+                    docker exec sims-db psql -U project_user -d project_sims -c "CREATE SCHEMA IF NOT EXISTS tenant_demo;"
+                    
                     echo "🔄 Reintentando migración multitenant..."
                     docker exec sims-backend php artisan tenants:migrate --force
                 fi
