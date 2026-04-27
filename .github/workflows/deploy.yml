@@ -21,26 +21,29 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           command_timeout: 30m
           script: |
-            echo "🚀 Iniciando actualización ultra-optimizada..."
+            echo "🚀 Iniciando actualización resiliente..."
             
-            # Definir ruta absoluta para evitar errores
-            PROJECT_DIR="/home/${{ secrets.SSH_USER }}/sims-project"
-            cd $PROJECT_DIR || { echo "❌ No se encontró la carpeta $PROJECT_DIR"; exit 1; }
+            # 1. Localizar el directorio del proyecto
+            PROJECT_ROOT="/home/${{ secrets.SSH_USER }}/sims-project"
+            if [ ! -d "$PROJECT_ROOT" ]; then
+              PROJECT_ROOT="$HOME/sims-project"
+            fi
+            
+            cd "$PROJECT_ROOT" || { echo "❌ Carpeta del proyecto no encontrada en $PROJECT_ROOT"; exit 1; }
+            echo "📍 Directorio actual: $(pwd)"
+            ls -F
 
-            echo "📊 Estado del disco:"
-            df -h .
-
-            # Función para streaming directo a Docker
+            # 2. Función para streaming directo a Docker
             stream_component() {
               NAME=$1
               REPO=$2
               URL=$(curl -s https://api.github.com/repos/Projecte-SIMS/$REPO/releases/latest | grep "browser_download_url.*-amd64\.tar" | cut -d '"' -f 4 | head -n 1)
               
               if [ ! -z "$URL" ]; then
-                echo "📥 Transmitiendo $NAME directamente a Docker..."
+                echo "📥 Transmitiendo $NAME desde $URL..."
                 curl -L "$URL" | docker load
               else
-                echo "⚠️ No se encontró release de $NAME para amd64"
+                echo "⚠️ No se encontró release de $NAME"
               fi
             }
 
@@ -49,20 +52,31 @@ jobs:
             stream_component "IoT" "IoT"
 
             echo "🔄 Reiniciando contenedores..."
-            # Buscar el archivo de compose dinámicamente si el nombre varía
-            COMPOSE_FILE="docker-compose.prod.yml"
-            if [ ! -f "$COMPOSE_FILE" ]; then
-                COMPOSE_FILE=$(ls docker-compose*.yml | head -n 1)
+            # Detección explícita del archivo
+            if [ -f "docker-compose.prod.yml" ]; then
+                CONF="docker-compose.prod.yml"
+            elif [ -f "docker-compose.yml" ]; then
+                CONF="docker-compose.yml"
+            else
+                # Buscar cualquier archivo que parezca un docker-compose
+                CONF=$(ls docker-compose*.yml 2>/dev/null | head -n 1)
             fi
-            
-            echo "📁 Usando archivo de configuración: $COMPOSE_FILE"
-            docker compose -f $COMPOSE_FILE up -d
+
+            if [ -z "$CONF" ]; then
+                echo "❌ Error: No se encontró ningún archivo docker-compose en $(pwd)"
+                ls -la
+                exit 1
+            fi
+
+            echo "📁 Usando archivo: $CONF"
+            docker compose -f "$CONF" up -d
 
             echo "⚙️ Ejecutando migraciones..."
-            docker exec sims-backend php artisan migrate --force || echo "⚠️ Error en migraciones base"
-            docker exec sims-backend php artisan tenants:migrate --force || echo "⚠️ Error en migraciones multitenant"
+            # Esperar a que el backend esté arriba
+            sleep 15
+            docker exec sims-backend php artisan migrate --force || echo "⚠️ Falló migración base"
+            docker exec sims-backend php artisan tenants:migrate --force || echo "⚠️ Falló migración multitenant"
 
-            echo "✨ Limpieza final de imágenes huérfanas..."
+            echo "✨ Limpieza final..."
             docker image prune -f
-
-            echo "✅ ¡Sistema actualizado y en marcha!"
+            echo "✅ ¡Actualización completada con éxito!"
