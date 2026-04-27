@@ -12,7 +12,7 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     
     steps:
-      - name: Desplegar en Servidor vía SSH
+      - name: Desplegar Releases en Servidor vía SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -20,24 +20,38 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            echo "🚀 Iniciando despliegue en SIMS Server..."
-            # Entrar en la carpeta del proyecto (ajustar si es diferente)
-            cd ~/SIMS_SPRINT4 || cd ~/project
+            echo "🚀 Iniciando actualización desde GitHub Releases..."
+            cd ~/sims-project
             
-            # 1. Bajar servicios actuales
-            docker compose down
+            # Crear carpeta de releases si no existe
+            mkdir -p releases
+            cd releases
+
+            echo "📦 Descargando últimas imágenes (.tar)..."
             
-            # 2. Actualizar desde Git
-            git pull origin main
+            # Descargar Backend
+            BACKEND_URL=$(curl -s https://api.github.com/repos/Projecte-SIMS/Backend/releases/latest | grep "browser_download_url.*tar" | cut -d '"' -f 4)
+            curl -L $BACKEND_URL -o backend.tar
             
-            # 3. Levantar con build para asegurar imágenes frescas
-            docker compose up -d --build
-            
-            # 4. Ejecutar migraciones multitenant
-            docker exec sims-backend php artisan migrate --force
-            docker exec sims-backend php artisan tenants:migrate --force
-            
-            # 5. Limpiar sistema
+            # Descargar Frontend
+            FRONTEND_URL=$(curl -s https://api.github.com/repos/Projecte-SIMS/Frontend/releases/latest | grep "browser_download_url.*tar" | cut -d '"' -f 4)
+            curl -L $FRONTEND_URL -o frontend.tar
+
+            # Descargar IoT
+            IOT_URL=$(curl -s https://api.github.com/repos/Projecte-SIMS/IoT/releases/latest | grep "browser_download_url.*tar" | cut -d '"' -f 4)
+            curl -L $IOT_URL -o iot.tar
+
+            echo "📥 Cargando imágenes en Docker..."
+            docker load -i backend.tar
+            docker load -i frontend.tar
+            docker load -i iot.tar
+
+            echo "🔄 Reiniciando contenedores..."
+            cd ~/sims-project
+            docker compose -f docker-compose.prod.yml up -d
+
+            echo "🧹 Limpiando archivos temporales..."
+            rm releases/*.tar
             docker image prune -f
-            
-            echo "✅ Despliegue completado con éxito."
+
+            echo "✅ ¡Sistema actualizado correctamente a la última versión!"
