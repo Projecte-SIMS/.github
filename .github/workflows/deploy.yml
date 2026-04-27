@@ -19,46 +19,42 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
-          command_timeout: 20m
+          command_timeout: 30m
           script: |
-            echo "🚀 Iniciando actualización optimizada (AMD64)..."
+            echo "🚀 Iniciando actualización ultra-optimizada (Streaming)..."
             cd ~/sims-project
             
-            # 0. Verificar espacio y limpiar
-            echo "📊 Espacio en disco inicial:"
-            df -h .
-            mkdir -p releases
-            rm -f releases/*.tar
+            echo "🧹 Limpieza agresiva inicial para liberar espacio..."
+            docker system prune -a -f --volumes || true
             
-            # Función para procesar componente (Descarga -> Carga -> Borra)
-            process_component() {
+            echo "📊 Espacio en disco tras limpieza:"
+            df -h .
+            
+            # Función para procesar componente vía Pipe (Internet -> Docker)
+            # Esto NO guarda el archivo .tar en disco, ahorrando mucho espacio.
+            stream_component() {
               NAME=$1
               REPO=$2
               URL=$(curl -s https://api.github.com/repos/Projecte-SIMS/$REPO/releases/latest | grep "browser_download_url.*-amd64\.tar" | cut -d '"' -f 4 | head -n 1)
               
               if [ ! -z "$URL" ]; then
-                echo "📦 Descargando $NAME desde $URL..."
-                curl -L "$URL" -o "releases/$NAME.tar"
-                echo "📥 Cargando $NAME en Docker..."
-                docker load -i "releases/$NAME.tar"
-                echo "🗑️ Borrando archivo temporal $NAME.tar..."
-                rm "releases/$NAME.tar"
+                echo "📥 Transmitiendo $NAME directamente a Docker..."
+                curl -L "$URL" | docker load
               else
                 echo "⚠️ No se encontró release de $NAME para amd64"
               fi
             }
 
-            # Procesar uno a uno para ahorrar espacio
-            process_component "Backend" "Backend"
-            process_component "Frontend" "Frontend"
-            process_component "IoT" "IoT"
+            stream_component "Backend" "Backend"
+            stream_component "Frontend" "Frontend"
+            stream_component "IoT" "IoT"
 
-            echo "🔄 Reiniciando contenedores con nuevas imágenes..."
+            echo "🔄 Reiniciando contenedores..."
             docker compose -f docker-compose.prod.yml up -d
 
-            echo "🧹 Limpiando imágenes antiguas (prune)..."
-            docker image prune -a -f
+            echo "✨ Limpieza final..."
+            docker image prune -f
 
             echo "📊 Espacio en disco final:"
             df -h .
-            echo "✅ ¡Sistema actualizado con éxito!"
+            echo "✅ ¡Sistema actualizado con éxito mediante streaming!"
