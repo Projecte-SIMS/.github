@@ -19,51 +19,46 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
+          command_timeout: 20m
           script: |
-            echo "🚀 Iniciando actualización desde GitHub Releases (AMD64)..."
+            echo "🚀 Iniciando actualización optimizada (AMD64)..."
             cd ~/sims-project
             
-            # Crear carpeta de releases si no existe
+            # 0. Verificar espacio y limpiar
+            echo "📊 Espacio en disco inicial:"
+            df -h .
             mkdir -p releases
-            cd releases
-
-            echo "📦 Descargando últimas imágenes (-amd64.tar)..."
+            rm -f releases/*.tar
             
-            # Descargar Backend AMD64
-            BACKEND_URL=$(curl -s https://api.github.com/repos/Projecte-SIMS/Backend/releases/latest | grep "browser_download_url.*-amd64\.tar" | cut -d '"' -f 4 | head -n 1)
-            if [ ! -z "$BACKEND_URL" ]; then
-              curl -L $BACKEND_URL -o backend.tar
-              echo "📥 Cargando Backend..."
-              docker load -i backend.tar && rm backend.tar
-            else
-              echo "⚠️ No se encontró release de Backend para amd64"
-            fi
-            
-            # Descargar Frontend AMD64
-            FRONTEND_URL=$(curl -s https://api.github.com/repos/Projecte-SIMS/Frontend/releases/latest | grep "browser_download_url.*-amd64\.tar" | cut -d '"' -f 4 | head -n 1)
-            if [ ! -z "$FRONTEND_URL" ]; then
-              curl -L $FRONTEND_URL -o frontend.tar
-              echo "📥 Cargando Frontend..."
-              docker load -i frontend.tar && rm frontend.tar
-            else
-              echo "⚠️ No se encontró release de Frontend para amd64"
-            fi
+            # Función para procesar componente (Descarga -> Carga -> Borra)
+            process_component() {
+              NAME=$1
+              REPO=$2
+              URL=$(curl -s https://api.github.com/repos/Projecte-SIMS/$REPO/releases/latest | grep "browser_download_url.*-amd64\.tar" | cut -d '"' -f 4 | head -n 1)
+              
+              if [ ! -z "$URL" ]; then
+                echo "📦 Descargando $NAME desde $URL..."
+                curl -L "$URL" -o "releases/$NAME.tar"
+                echo "📥 Cargando $NAME en Docker..."
+                docker load -i "releases/$NAME.tar"
+                echo "🗑️ Borrando archivo temporal $NAME.tar..."
+                rm "releases/$NAME.tar"
+              else
+                echo "⚠️ No se encontró release de $NAME para amd64"
+              fi
+            }
 
-            # Descargar IoT AMD64
-            IOT_URL=$(curl -s https://api.github.com/repos/Projecte-SIMS/IoT/releases/latest | grep "browser_download_url.*-amd64\.tar" | cut -d '"' -f 4 | head -n 1)
-            if [ ! -z "$IOT_URL" ]; then
-              curl -L $IOT_URL -o iot.tar
-              echo "📥 Cargando IoT..."
-              docker load -i iot.tar && rm iot.tar
-            else
-              echo "⚠️ No se encontró release de IoT para amd64"
-            fi
+            # Procesar uno a uno para ahorrar espacio
+            process_component "Backend" "Backend"
+            process_component "Frontend" "Frontend"
+            process_component "IoT" "IoT"
 
-            echo "🔄 Reiniciando contenedores..."
-            cd ~/sims-project
+            echo "🔄 Reiniciando contenedores con nuevas imágenes..."
             docker compose -f docker-compose.prod.yml up -d
 
-            echo "🧹 Limpiando sistema..."
-            docker image prune -f
+            echo "🧹 Limpiando imágenes antiguas (prune)..."
+            docker image prune -a -f
 
-            echo "✅ ¡Sistema actualizado correctamente a la versión AMD64!"
+            echo "📊 Espacio en disco final:"
+            df -h .
+            echo "✅ ¡Sistema actualizado con éxito!"
