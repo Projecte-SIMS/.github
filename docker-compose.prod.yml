@@ -3,7 +3,7 @@ services:
   backend:
     build:
       context: ./project-sims-backend
-    image: sims-backend:latest
+    image: sims-backend:latest-amd64
     container_name: sims-backend
     ports:
       - "8000:8000"
@@ -50,7 +50,7 @@ services:
   iot-server:
     build:
       context: ./Raspberry_py/server
-    image: sims-iot-server:latest
+    image: sims-iot-server:latest-amd64
     container_name: sims-iot-server
     ports:
       - "8001:8000"
