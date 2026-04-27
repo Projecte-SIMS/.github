@@ -66,7 +66,7 @@ services:
     build:
       context: ./project-sims-frontend
       target: production
-    image: sims-frontend:latest
+    image: sims-frontend:latest-amd64
     container_name: sims-frontend
     ports:
       - "80:80"
