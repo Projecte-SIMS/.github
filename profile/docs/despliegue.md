@@ -6,11 +6,12 @@ Este manual describe los pasos necesarios para levantar el ecosistema SIMS compl
 - **Docker & Docker Compose** (Recomendado)
 - **PHP 8.2+** (Para desarrollo local sin Docker)
 - **Node.js 20+** (Para frontend)
-- **PostgreSQL 16** (Con soporte de esquemas)
+- **PostgreSQL 15** (Con soporte de esquemas)
 - **MongoDB** (Para telemetría)
 
 ## 2. Levantamiento con Docker (Recomendado)
-El proyecto incluye archivos `docker-compose.yml` preconfigurados para levantar backend, frontend y bases de datos.
+El proyecto usa el `docker-compose.yml` de la raíz para levantar backend, frontend y bases de datos.
+Los compose históricos se movieron a `docs/legacy/docker-compose/`.
 
 ```bash
 # 1. Clonar el repositorio y entrar en la raíz
@@ -20,9 +21,9 @@ cd SIMS_SPRINT4
 docker compose up -d --build
 
 # 3. Configurar Backend
-docker compose exec backend composer install
-docker compose exec backend php artisan key:generate
-docker compose exec backend php artisan migrate --seed # Migra el Landlord (Central)
+docker exec sims-backend composer install
+docker exec sims-backend php artisan key:generate
+docker exec sims-backend php artisan migrate --seed # Migra el Landlord (Central)
 
 # 4. Configurar Frontend
 cd project-sims-frontend
@@ -57,7 +58,7 @@ Para crear el inquilino inicial de prueba (demo):
 
 ```bash
 # Ejecutar el seeder central (Landlord)
-docker compose exec backend php artisan db:seed --class=CentralSeeder
+docker exec sims-backend php artisan db:seed --class=CentralSeeder
 ```
 
 Este comando:
@@ -67,7 +68,7 @@ Este comando:
 
 Para ejecutar migraciones en todos los inquilinos existentes:
 ```bash
-docker compose exec backend php artisan tenants:migrate
+docker exec sims-backend php artisan tenants:migrate
 ```
 
 ## 5. Despliegue en Producción

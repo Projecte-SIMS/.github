@@ -31,7 +31,7 @@ Todas las peticiones a la API desde rutas de inquilino (`/admin`, `/app`) inyect
 | **Frontend** | Vue 3 + Vite + TypeScript | SPA reactiva con soporte multitenant. |
 | **Backend API** | Laravel 12 + PHP 8.2 | Lógica de negocio, RBAC y gestión de esquemas. |
 | **IoT Server** | FastAPI + Python 3.11 | Microservicio de telemetría vía WebSockets. |
-| **Bases de Datos** | PostgreSQL 16 + MongoDB Atlas | Datos relacionales (Negocio) + NoSQL (Telemetría). |
+| **Bases de Datos** | PostgreSQL 15 + MongoDB Atlas | Datos relacionales (Negocio) + NoSQL (Telemetría). |
 | **Infraestructura** | Render (API/IoT) + Vercel (Frontend) | Despliegue CI/CD automatizado. |
 
 ## 5. Integración IoT y Telemetría
