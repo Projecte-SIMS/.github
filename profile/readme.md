@@ -2,7 +2,7 @@
 
 **Versión:** Sprint 6 – Chaos & Delivery (Multitenant Architecture)  
 **Fecha:** Abril 2026  
-**Licencia:** EUPL v1.2
+**Licencia:** EUPL v1.2  
 **Link:** https://landing.fleetly.deltahost.asix2.iesmontsia.cat/
 
 ---
